@@ -1,0 +1,94 @@
+<div class="container my-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="display-4 text-center flex-grow-1">Lista de Tareas</h1>
+    <button class="btn btn-danger btn-lg shadow-sm" (click)="logout()">
+      <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+    </button>
+  </div>
+  
+  <div class="row text-center mb-4">
+    <div class="col-md-4">
+      <div class="card shadow-lg border-0">
+        <div class="card-body">
+          <h5 class="card-title fw-bold">Total de Tareas</h5>
+          <p class="card-text fs-2 text-primary">{{ Allindicators.total_tasks }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-lg border-0">
+        <div class="card-body">
+          <h5 class="card-title text-warning fw-bold">Pendientes</h5>
+          <p class="card-text fs-2 text-warning">{{ Allindicators.pending_tasks }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-lg border-0">
+        <div class="card-body">
+          <h5 class="card-title text-success fw-bold">Completadas</h5>
+          <p class="card-text fs-2 text-success">{{ Allindicators.completed_tasks }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+   <div class="d-flex flex-column flex-md-row justify-content-center align-items-center gap-5 mt-4">
+    <div class="w-100">
+      <h5 class="text-info text-center">Tareas completadas por semana</h5>
+      <div *ngFor="let entry of tasksByWeek" class="d-flex align-items-center justify-content-center">
+        <span class="fw-bold text-dark me-3">{{ entry.week }}</span>
+        <div class="progress w-75">
+          <div class="progress-bar bg-info" role="progressbar" [style.width.%]="(entry.count * 5)">
+            {{ entry.count }} tareas
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="text-center">
+      <h5 class="text-primary">Progreso de tareas</h5>
+      <div class="progress-circle mx-auto">
+        <svg viewBox="0 0 100 100" class="progress-svg">
+          <circle class="progress-bg" cx="50" cy="50" r="40"></circle>
+          <circle class="progress-bar" cx="50" cy="50" r="40" [style.strokeDasharray]="getProgressArc()"></circle>
+        </svg>
+        <div class="progress-text fw-bold">{{ Allindicators.progress_percentage }}%</div>
+      </div>
+    </div>
+  </div>
+  
+
+  <div class="d-flex justify-content-center my-4">
+    <button class="btn btn-success btn-lg shadow-sm" (click)="navigateTo('/tasks/new')">
+      <i class="bi bi-plus-lg"></i> Crear Nueva Tarea
+    </button>
+  </div>
+  
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4 mb-4" *ngFor="let task of tasks">
+        <div class="card shadow-lg border-0">
+          <div class="card-body">
+            <h5 class="card-title"><i class="bi bi-file-earmark-text"></i> {{task.title}}</h5>
+            <h6 class="card-subtitle mb-2 text-muted">
+              <span class="badge bg-{{ getStatusClass(task.status) }}">{{task.status}}</span>
+            </h6>
+            <p class="card-text">{{task.description}}</p>
+            <p class="text-muted" *ngIf="task.user">
+              <i class="bi bi-person"></i> Creado por: <strong>{{ task.user.name }}</strong>
+            </p>            
+            <div class="d-flex justify-content-between">
+              <button class="btn btn-outline-primary btn-sm" (click)="navigateTo('/tasks/edit/' + task.id)">
+                <i class="bi bi-pencil"></i> Editar
+              </button>
+              <button class="btn btn-outline-danger btn-sm" (click)="deleteTask(task.id)">
+                <i class="bi bi-trash"></i> Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
