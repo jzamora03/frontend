@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
 import { ApiService } from '../../core/api.service';
 import { MatTableModule } from '@angular/material/table'; 
@@ -8,6 +8,8 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatBadgeModule } from '@angular/material/badge';
 import { Router } from '@angular/router';
 import { NgCircleProgressModule } from 'ng-circle-progress';
+import { TaskAssignComponent } from '../task-assign/task-assign.component';
+import { FormsModule } from '@angular/forms';
 
 
 @Component({
@@ -15,13 +17,15 @@ import { NgCircleProgressModule } from 'ng-circle-progress';
   standalone: true,
   imports: [
     CommonModule,
-    MatTableModule, 
-    MatSelectModule, 
-    RouterModule, 
+    FormsModule,
+    MatTableModule,
+    MatSelectModule,
+    RouterModule,
     MatChipsModule,
     MatBadgeModule,
-    NgCircleProgressModule
-  ],
+    NgCircleProgressModule,
+
+],
   templateUrl: './task-list.component.html',
   styleUrls: ['./task-list.component.css']
 })
@@ -30,7 +34,10 @@ export class TaskListComponent implements OnInit {
   tasks: any[] = [];
   Allindicators = { total_tasks: 0, pending_tasks: 0, completed_tasks: 0, progress_percentage: 0  };
   tasksByWeek: any[] = [];
-
+  taskId: number = 0;
+  selectedUserId: number = 0;
+  users: any[] = [];
+  isModalOpen: boolean = false; 
 
   constructor(private apiService: ApiService, private router: Router) {}
 
@@ -55,9 +62,17 @@ export class TaskListComponent implements OnInit {
         count: entry.count
       }));
     });
-  
-  
 
+    this.apiService.getUsers().subscribe(users => {
+      this.users = users; 
+    });
+
+    this.apiService.getTasks().subscribe(tasks => {
+      this.tasks = tasks.map((task: { user_assigned: any; }) => ({
+        ...task,
+        user_assigned: this.users.find(user => user.id === task.user_assigned) || null 
+      }));
+    });
   }
 
   deleteTask(id: number): void {
@@ -91,5 +106,52 @@ export class TaskListComponent implements OnInit {
     this.router.navigate(['/login']);
     console.log("Sesión cerrada. Redirigiendo a login...");
   }
+
+  openAssignTaskModal(taskId: number): void {
+    this.taskId = taskId;
+    this.selectedUserId = 0;
+    this.isModalOpen = true;
+    console.log("Tarea seleccionada:", this.taskId);
+  }
+
+  closeAssignTaskModal(): void {
+    this.isModalOpen = false; 
+  }
+
+ 
+  onUserSelected(event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    this.selectedUserId = Number(target.value);
+    console.log("Usuario seleccionado:", this.selectedUserId);
+  }
   
+
+  assignTask(taskId: number, userId: number): void {
+    console.log("Intentando asignar tarea con:", { taskId, userId });
+  
+    if (!taskId || !userId || userId === 0) {
+      console.error("Error: Tarea o usuario no seleccionado.");
+      alert("Por favor, selecciona un usuario antes de asignar la tarea.");
+      return;
+    }
+  
+    this.apiService.assignUser(taskId, userId).subscribe(
+      response => {
+        console.log("Usuario asignado correctamente:", response);
+        
+        this.tasks = this.tasks.map(task => {
+          if (task.id === taskId) {
+            return { ...task, user_assigned: this.users.find(user => user.id === userId) };
+          }
+          return task;
+        });
+        
+        this.closeAssignTaskModal();
+        location.reload();
+      },
+      error => {
+        console.error("Error al asignar usuario:", error);
+      }
+    );
+  }
 }

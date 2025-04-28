@@ -60,6 +60,18 @@ export class ApiService {
     return this.http.get<any[]>(`${this.apiUrl}/tasks/tasksCompletedByWeek`, { headers: this.getAuthHeaders() });
   }
 
+  getUsers(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/getAllUsers`, { headers: this.getAuthHeaders() });
+  }
+  
+  assignTask(taskId: number, userId: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/tasks/assign/${taskId}`, { user_id: userId }, { headers: this.getAuthHeaders() });
+  }
+
+  assignUser(taskId: number, userId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/tasks/${taskId}/assign-user`, { user_assigned: userId }, { headers: this.getAuthHeaders() });
+  }
+
   isAuthenticated(): boolean {
     const token = localStorage.getItem('auth_token');
     return !!token; 

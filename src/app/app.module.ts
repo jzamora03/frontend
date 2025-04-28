@@ -10,8 +10,8 @@ import { TaskFormComponent } from './tasks/task-form/task-form.component';
 import { ApiService } from './core/api.service';
 import { provideHttpClient } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
-import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 import { SessionExpiredComponent } from './session-expired/session-expired.component';
+import { TaskAssignComponent } from './tasks/task-assign/task-assign.component';
 
 
 
@@ -24,6 +24,7 @@ import { SessionExpiredComponent } from './session-expired/session-expired.compo
     AppComponent,
     LoginComponent,
     RegisterComponent,
+    TaskAssignComponent,
     TaskListComponent,
     TaskFormComponent,
     RouterModule,

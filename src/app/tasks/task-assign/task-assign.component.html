@@ -1,0 +1,11 @@
+<div class="modal">
+    <div class="modal-content">
+      <h5 class="modal-title">Asignar tarea</h5>
+  
+      <label for="userSelect">Selecciona un usuario</label>
+      <select id="userSelect" class="form-select" [(ngModel)]="selectedUserId">
+        <option *ngFor="let user of users" [value]="user.id">{{ user.name }}</option>
+      </select>      
+      <button class="btn btn-primary mt-3" (click)="assignTask()">Asignar tarea</button>
+    </div>
+  </div>
